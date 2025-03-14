@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- Karakter kodlaması olarak UTF-8 kullanılıyor -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Responsive tasarım için gerekli ayar -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS kütüphanesini ekliyoruz -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5.0.0/dist/full.css"
+      rel="stylesheet"
+    />
+    <!-- DaisyUI kütüphanesi için stil dosyası -->
+    <title>Görev Listesi</title>
+    <!-- Sayfa başlığı -->
+  </head>
+  <body>
+    <!-- Ana kapsayıcı bölüm -->
+    <div
+      class="bg-gray-800 w-full min-h-screen flex flex-col items-center justify-center p-5"
+    >
+      <!-- Yeni liste için input alanı -->
+      <input
+        id="listInput"
+        type="text"
+        class="text-gray-50 rounded bg-gray-600 border border-gray-500 w-full p-2 mb-4"
+        placeholder="Yeni Liste Adı..."
+      />
+      <!-- Yeni liste oluşturma butonu -->
+      <button
+        id="createListBtn"
+        class="bg-gray-900 hover:bg-gray-700 text-white font-sans px-4 py-2 rounded w-full mb-4"
+      >
+        Yeni Liste Oluştur
+      </button>
+
+      <!-- Görev listelerinin görüntüleneceği alan -->
+      <ul id="todoList" class="mt-4 w-full"></ul>
+    </div>
+
+    <script>
+      const listInput = document.getElementById("listInput"); // liste adı input alanı
+      const createListBtn = document.getElementById("createListBtn"); // yeni liste oluşturma butonu
+      let todoLists = []; // Görev listelerini tutacak dizi
+
+      // Listeleri ekranda görüntüle
+      function printLists() {
+        const listUl = document.getElementById("todoList"); // Görev listesinin UL elemanı
+        listUl.innerHTML = ""; // Önceki listeyi temizle
+
+        // Her liste için döngü
+        todoLists.forEach((list, listIndex) => {
+          const li = document.createElement("li"); // Her bir liste için bir LI oluştur
+          li.className = "bg-gray-700 text-gray-50 p-4 mb-4 rounded"; // Stil ayarları
+
+          const listHeader = document.createElement("h3"); // Liste başlığı
+          listHeader.className = "text-xl font-bold"; // Stil ayarları
+          listHeader.innerText = list.name; // Liste adını başlığa ekle
+          li.appendChild(listHeader); // Liste başlığını LI içine ekle
+
+          // Öğeleri listelemek için bir UL oluştur
+          const itemsUl = document.createElement("ul");
+          itemsUl.className = "mt-2"; // Üstte boşluk bırak
+
+          // Liste içerisindeki her öğeyi görüntüle
+          list.items.forEach((item, itemIndex) => {
+            const itemLi = document.createElement("li"); // Her bir öğe için LI oluştur
+            itemLi.className =
+              "flex justify-between items-center p-2 border-b border-gray-600"; // Stil ayarları
+            itemLi.innerText = item; // Öğeyi LI içine ekle
+
+            // Silme düğmesi oluştur
+            const deleteButton = document.createElement("button");
+            deleteButton.innerText = "Sil"; // Buton üzerinde görünen metin
+            deleteButton.className =
+              "bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-4"; // Stil ayarları
+
+            // Silme düğmesine tıklama olayı ekle
+            deleteButton.addEventListener("click", () => {
+              deleteItem(listIndex, itemIndex); // İlgili öğeyi sil
+            });
+
+            itemLi.appendChild(deleteButton); // Silme butonunu öğeye ekle
+            itemsUl.appendChild(itemLi); // Öğeyi UL içine ekle
+          });
+
+          // Yeni öğe eklemek için input ve buton oluştur
+          const itemInput = document.createElement("input");
+          itemInput.type = "text";
+          itemInput.placeholder = "Yeni öğe ekle..."; // Input alanında görünür metin
+          itemInput.className =
+            "text-gray-50 rounded bg-gray-600 border border-gray-500 w-3/4 p-2 mt-2"; // Stil ayarları
+
+          const addButton = document.createElement("button");
+          addButton.innerText = "Ekle"; // Buton üzerinde görünen metin
+          addButton.className =
+            "bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded ml-2"; // Stil ayarları
+
+          // Ekleme butonuna tıklama olayı ekle
+          addButton.addEventListener("click", () => {
+            addItem(listIndex, itemInput.value); // Yeni öğeyi ekle
+            itemInput.value = ""; // Girdi kutusunu temizle
+          });
+
+          // Öğeleri ve butonları birleştir ve listeye ekle
+          li.appendChild(itemsUl); // Öğeleri listele
+          li.appendChild(itemInput); // Yeni öğe girişi
+          li.appendChild(addButton); // Ekle düğmesi
+          listUl.appendChild(li); // Listeyi ekle
+        });
+      }
+
+      // Yeni liste oluşturma fonksiyonu
+      function createList() {
+        const listName = listInput.value.trim(); // Girişi al ve boşlukları temizle
+        if (listName) {
+          todoLists.push({ name: listName, items: [] }); // Yeni listeyi oluştur ve ekle
+          listInput.value = ""; // Girdi kutusunu temizle
+          printLists(); // Listeyi güncelle
+        } else {
+          alert("Lütfen bir liste adı girin!"); // Eğer boşsa uyarı ver
+        }
+      }
+
+      // Yeni öğe ekleme fonksiyonu
+      function addItem(listIndex, itemName) {
+        if (itemName) {
+          todoLists[listIndex].items.push(itemName); // Yeni öğeyi ilgili listeye ekle
+          printLists(); // Listeyi güncelle
+        } else {
+          alert("Lütfen bir öğe adı girin!"); // Eğer boşsa uyarı ver
+        }
+      }
+
+      // Öğeyi silme fonksiyonu
+      function deleteItem(listIndex, itemIndex) {
+        todoLists[listIndex].items.splice(itemIndex, 1); // İlgili öğeyi sil
+        printLists(); // Listeyi güncelle
+      }
+
+      createListBtn.addEventListener("click", createList); // "Yeni Liste Oluştur" butonuna tıklama olayı ekle
+    </script>
+  </body>
+</html>

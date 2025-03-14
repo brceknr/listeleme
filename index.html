@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5.0.0/dist/full.css"
+      rel="stylesheet"
+    />
+    <title>Liste Oluşturma</title>
+  </head>
+  <body>
+    <div
+      class="bg-gray-800 w-full h-screen flex-col items-center justify-center p-5"
+    >
+      <input
+        id="listInput"
+        type="text"
+        class="text-gray-50 rounded bg-gray-600 border-gray-500 w-full p-2 mb-5"
+        placeholder="New list name..."
+      />
+
+      <button
+        id="createListBtn"
+        class="bg-gray-900 hover:bg-gray-700 text-white font-sans px-4 py-2 rounded w-full mb-4"
+      >
+        Create New List
+      </button>
+
+      <ul id="todoList" class="mt-4 w-full"></ul>
+    </div>
+
+    <script>
+      const listInput = document.getElementById("listInput");
+      const createListBtn = document.getElementById("createListBtn");
+      const todoLists = [];
+
+      function printLists() {
+        const listUl = document.getElementById("todoList");
+        listUl.innerHTML = "";
+
+        todoLists.forEach((list, listIndex) => {
+          const li = document.createElement("li");
+          li.className = "bg-gray-700 text-gray-50 p-4 mb-4 rounded";
+
+          const listHeader = document.createElement("h3");
+          listHeader.className = "text-xl font-bold";
+          listHeader.innerText = list.name;
+          li.appendChild(listHeader);
+
+          const itemsUl = document.createElement("ul");
+          itemsUl.className = "mt-2";
+
+          list.items.forEach((item, itemIndex) => {
+            const itemLi = document.createElement("li");
+            itemLi.className =
+              "flex justify-between items-center p-2 border-b border-gray-600";
+            itemLi.innerText = item;
+
+            const deleteButton = document.createElement("button");
+            deleteButton.innerText = "Delete";
+            deleteButton.className =
+              "bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-2 rounded ml-4";
+
+            deleteButton.addEventListener("click", () => {
+              deleteItem(listIndex, itemIndex);
+            });
+
+            itemLi.appendChild(deleteButton);
+            itemsUl.appendChild(itemLi);
+          });
+
+          const itemInputContainer = document.createElement("div");
+          itemInputContainer.className = "flex flex-col items-start mt-4";
+
+          const itemInput = document.createElement("input");
+          itemInput.type = "text";
+          itemInput.placeholder = "Add a new item...";
+          itemInput.className =
+            "text-gray-50 rounded bg-gray-600 border border-gray-500 w-full p-2 mt-2";
+
+          const addButton = document.createElement("button");
+          addButton.innerText = "Add Item";
+          addButton.className =
+            "bg-gray-500 hover:bg-gray-800 text-white font-bold py-1 px-2 rounded mt-2 w-full";
+
+          addButton.addEventListener("click", () => {
+            addItem(listIndex, itemInput.value);
+            itemInput.value = "";
+          });
+
+          itemInputContainer.appendChild(itemInput);
+          itemInputContainer.appendChild(addButton);
+          li.appendChild(itemsUl);
+          li.appendChild(itemInputContainer);
+          listUl.appendChild(li);
+        });
+      }
+
+      function createList() {
+        const listName = listInput.value.trim();
+        if (listName) {
+          todoLists.push({ name: listName, items: [] });
+          listInput.value = "";
+          printLists();
+        }
+      }
+
+      function addItem(listIndex, itemName) {
+        if (itemName) {
+          todoLists[listIndex].items.push(itemName);
+          printLists();
+        }
+      }
+
+      function deleteItem(listIndex, itemIndex) {
+        todoLists[listIndex].items.splice(itemIndex, 1);
+        printLists();
+      }
+
+      createListBtn.addEventListener("click", createList);
+    </script>
+  </body>
+</html>
